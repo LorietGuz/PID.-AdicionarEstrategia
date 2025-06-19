@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import Vue3Quill from 'vue3-quill';
-import 'quill/dist/quill.snow.css';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const app = createApp(App);
-app.use(Vue3Quill);
+app.component('QuillEditor', QuillEditor);
 app.mount('#app');
