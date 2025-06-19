@@ -21,12 +21,12 @@
         <div class="form-row">
           <div class="form-group">
             <label for="fechaInicio">Fecha inicio <span class="required">*</span></label>
-            <input id="fechaInicio" type="date" v-model="form.fechaInicio" :class="{'input-error': errors.fechaInicio || !form.fechaInicio}" @change="animateDateInput" />
+            <input id="fechaInicio" type="date" v-model="form.fechaInicio" :class="{'input-error': errors.fechaInicio || !form.fechaInicio}" @change="animateDateInput" @mouseenter="showDatePicker" />
             <div v-if="errors.fechaInicio" class="error-message">{{ errors.fechaInicio }}</div>
           </div>
           <div class="form-group">
             <label for="fechaFin">Fecha fin <span class="required">*</span></label>
-            <input id="fechaFin" type="date" v-model="form.fechaFin" :class="{'input-error': errors.fechaFin || !form.fechaFin}" @change="animateDateInput" />
+            <input id="fechaFin" type="date" v-model="form.fechaFin" :class="{'input-error': errors.fechaFin || !form.fechaFin}" @change="animateDateInput" @mouseenter="showDatePicker" />
             <div v-if="errors.fechaFin" class="error-message">{{ errors.fechaFin }}</div>
           </div>
         </div>
@@ -110,7 +110,7 @@ function validateForm() {
   if (!form.no) {
     errors.no = 'El campo número es obligatorio.';
     valid = false;
-  } else if (!/^\d+$/.test(form.no)) {
+  } else if (!/^[\d]+$/.test(form.no)) {
     errors.no = 'El campo número debe ser numérico.';
     valid = false;
   } else if (parseInt(form.no) <= 0) {
@@ -129,6 +129,15 @@ function validateForm() {
     errors.fechaFin = 'La fecha de fin es obligatoria.';
     valid = false;
   }
+  // Validación de fechas
+  if (form.fechaInicio && form.fechaFin) {
+    const inicio = new Date(form.fechaInicio);
+    const fin = new Date(form.fechaFin);
+    if (inicio > fin) {
+      errors.fechaFin = 'La fecha de fin debe ser igual o posterior a la fecha de inicio.';
+      valid = false;
+    }
+  }
   if (!validateEditor()) {
     valid = false;
   }
@@ -143,6 +152,10 @@ function animateDateInput(e) {
   setTimeout(() => {
     e.target.classList.remove('date-anim');
   }, 350);
+}
+
+function showDatePicker(e) {
+  e.target.focus();
 }
 </script>
 
@@ -404,5 +417,35 @@ input[type="number"] {
 }
 ::-webkit-scrollbar-thumb {
   background: #bdb6c6;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.35s cubic-bezier(.4,2,.3,1), transform 0.35s cubic-bezier(.4,2,.3,1);
+}
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  transform: scale(1.35);
+}
+input[type="date"] {
+  transition: box-shadow 0.3s, border 0.3s;
+  min-height: 48px;
+  font-size: 1.15rem;
+  padding: 0.7rem 1.2rem;
+}
+
+/* Agrandar el calendario nativo en navegadores Webkit (Chrome, Edge, Safari) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  width: 2.2em;
+  height: 2.2em;
+}
+
+@-moz-document url-prefix() {
+  input[type="date"] {
+    font-size: 1.15rem;
+    min-height: 48px;
+    padding: 0.7rem 1.2rem;
+  }
 }
 </style>
